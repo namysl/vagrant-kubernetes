@@ -1,0 +1,27 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.provider "libvirt" do |vb|
+    vb.memory = 2048
+    vb.cpus = 2
+  end
+
+  config.vm.box = "generic/ubuntu2004"
+
+  config.vm.define "minikube-test"
+  config.vm.hostname = "minikube-test"
+
+  # 8001 = Kubernetes Dashboard
+  config.vm.network "forwarded_port", guest: 8001, host: 8001
+  # 30001 = Minikube service
+  config.vm.network "forwarded_port", guest: 30001, host: 30001
+  # 30002 = Prometheus
+  config.vm.network "forwarded_port", guest: 30002, host: 30002
+  # 30003 = Grafana
+  config.vm.network "forwarded_port", guest: 30003, host: 30003
+
+  config.vm.provision "docker"
+  config.vm.provision "shell", path: "config.sh"
+
+end
