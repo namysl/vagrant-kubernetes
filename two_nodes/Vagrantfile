@@ -29,9 +29,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "master" do |master|
     master.vm.hostname = "master"
 
-    master.vm.provision "shell", inline: <<-EOF
-      git clone git clone https://github.com/namysl/vagrant-kubernetes-two-nodes.git
-    EOF
+    master.vm.provision "shell", inline: "git clone https://github.com/namysl/vagrant-kubernetes-two-nodes.git"
   end
 
   config.vm.define "worker1" do |worker1|
