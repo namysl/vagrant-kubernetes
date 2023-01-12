@@ -1,0 +1,45 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.provider "libvirt" do |vb|
+    vb.memory = 2048
+    vb.cpus = 2
+  end
+
+  config.vm.box = "generic/ubuntu2004"
+
+  # 8001 = Kubernetes Dashboard
+  config.vm.network "forwarded_port", guest: 30000, host: 8001
+  # 30001 = Minikube service
+  config.vm.network "forwarded_port", guest: 30001, host: 30001
+  # 30002 = Prometheus
+  config.vm.network "forwarded_port", guest: 30002, host: 30002
+  # 30003 = Grafana
+  config.vm.network "forwarded_port", guest: 30003, host: 30003
+
+  config.vm.provision "docker"
+
+  config.vm.provision "shell", inline: <<-EOF
+    snap install microk8s --classic
+    microk8s status --wait-ready
+    usermod -a -G microk8s vagrant
+  EOF
+
+  config.vm.define "master" do |master|
+    master.vm.hostname = "master"
+
+    master.vm.provision "shell", inline: <<-EOF
+      git clone git clone https://github.com/namysl/vagrant-kubernetes-two-nodes.git
+    EOF
+  end
+
+  config.vm.define "worker1" do |worker1|
+    worker1.vm.hostname = "worker1"
+  end
+
+  config.vm.define "worker2" do |worker2|
+    worker2.vm.hostname = "worker2"
+  end
+
+end
